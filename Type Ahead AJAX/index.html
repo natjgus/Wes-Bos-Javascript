@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+const cities = [];
+// Fetch returns a promise, we then need to pull the JSON data from that promise and then the city from that blob
+//Spread and Push is ES6 look it up if you need!
+fetch(endpoint)
+    .then(blob => blob.json())
+    .then(data => cities.push(...data));
+
+
+// Now we need to create a function that will test whatever is typed in versus the cities on the list
+function findMatches (wordToMatch, cities){
+    // We want to return the cities that atch whatever as been typed
+    return cities.filter( place => {
+        // We are creating a reegular expression that can be used with our variable
+        // The 'gi' shows that this is a global and insensitive (to case) expression
+        const regex = new RegExp(wordToMatch, 'gi');
+        return place.city.match(regex) || place.state.match(regex);
+    })
+}
+
+// Now we need to create a function to display whenever someone types
+function displayMatches () {
+    const arrayMatches = findMatches( this.value, cities);
+    const html = arrayMatches.map( place => {
+        return `
+            <li>
+                <span class="name">${place.city}, ${place.state}</span>
+                <span class="population">${place.population}</span>
+            </li>
+            `;
+    });
+
+    suggestions.innerHTML =html;
+}
+
+
+const searchInput = document.querySelector('.search');
+const suggestions = document.querySelector('.suggestions');
+
+searchInput.addEventListener('change', displayMatches);
+searchInput.addEventListener('keyup', displayMatches);
+
+</script>
+</body>
+</html>
